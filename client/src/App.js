@@ -43,12 +43,13 @@ class DeliveryForm extends React.Component {
     event.preventDefault();
 
     let newState = {...this.state}
+    const message = "This field is required";
 
     for(let input in this.state.input.recipient) {
       if(this.state.input.recipient[input] === '') {
-        newState.errors.input.recipient[input] = true;
+        newState.errors.input.recipient[input] = message;
       } else {
-        newState.errors.input.recipient[input] = false;
+        newState.errors.input.recipient[input] = '';
       }
     }
 
@@ -77,25 +78,28 @@ class DeliveryForm extends React.Component {
           floatingLabelText="Recipient Name"
           hintText=""
           name="name"
-          errorText=""
+          errorText={this.state.errors.input.recipient.name}
           value={this.state.input.recipient.name}
         />
         <TextField 
           floatingLabelText="Recipient Street"
           hintText=""
           name="street"
+          errorText={this.state.errors.input.recipient.street}
           value={this.state.input.recipient.street}
         />
         <TextField 
           floatingLabelText="Recipient City"
           hintText=""
           name="city"
+          errorText={this.state.errors.input.recipient.city}
           value={this.state.input.recipient.city}
         />
         <TextField 
           floatingLabelText="Recipient Country"
           hintText=""
           name="country"
+          errorText={this.state.errors.input.recipient.country}
           value={this.state.input.recipient.country}
         />
         <TextField 
@@ -103,6 +107,7 @@ class DeliveryForm extends React.Component {
           hintText=""
           type="number"
           name="zipcode"
+          errorText={this.state.errors.input.recipient.zipcode}
           value={this.state.input.recipient.zipcode}
         />
         <TextField 
@@ -110,6 +115,7 @@ class DeliveryForm extends React.Component {
           hintText=""
           type="number"
           name="phone"
+          errorText={this.state.errors.input.recipient.phone}
           value={this.state.input.recipient.phone}
         />
         <Divider />
