@@ -1,20 +1,48 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import {RaisedButton,TextField, Divider, DatePicker} from 'material-ui';
+import {RaisedButton,TextField, DatePicker, SelectField, MenuItem} from 'material-ui';
 
-function post(url, data) {
-  return fetch(url, {
-    method: 'POST',
+function http(url, data) {
+  let request = {
+    method: data ? 'POST' : 'GET',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data)
-  })
+    }
+  }
+  
+  if(data) request.body = JSON.stringify(data)
+
+  return fetch(url, request)
+
   .then(function(response) {
     return response.json();
   });
+}
+
+class Countries extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      countries: [],
+    }
+
+    http('http://localhost:5000/countries')
+      .then((data) => {
+        let newState = {...this.state}
+        newState.countries = data;
+        this.setState(newState);
+      })
+  }
+
+
+
+  render() {
+    return (
+      this.state.countries.map(country => <MenuItem value={country.id} key={country.id} primaryText={country.name} />)
+    )
+  }
 }
 
 class DeliveryForm extends React.Component {
@@ -28,7 +56,6 @@ class DeliveryForm extends React.Component {
           zipcode:"",
           street:"",
           city:"",
-          state:"",
           country:"",
           phone:""
         }
@@ -42,7 +69,6 @@ class DeliveryForm extends React.Component {
             zipcode:"",
             street:"",
             city:"",
-            state:"",
             country:"",
             phone:""
           }
@@ -51,17 +77,25 @@ class DeliveryForm extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+
+    
+  }
+
+  getCountries() {
+    return http('http://localhost:5000/countries/');
   }
 
   handleSubmit(event) {
     event.preventDefault();
 
     let newState = {...this.state}
+    let error = false;
     const message = "This field is required";
 
     for(let input in this.state.input.recipient) {
       if(this.state.input.recipient[input] === '') {
         newState.errors.input.recipient[input] = message;
+        error = true;
       } else {
         newState.errors.input.recipient[input] = '';
       }
@@ -71,13 +105,18 @@ class DeliveryForm extends React.Component {
       && this.state.input.delivery_at.constructor === Object)
       {
         newState.errors.input.delivery_at = message;
+        error = true;
       } 
     else {
       newState.errors.input.delivery_at = '';
     }
+
     this.setState(newState);
 
-    post('http://localhost:5000/tasks/', this.state.input)
+    if(error)return
+  
+
+    http('http://localhost:5000/tasks/', this.state.input)
     .then(data => console.log(data))
 
   }
@@ -104,42 +143,45 @@ class DeliveryForm extends React.Component {
           value={this.state.input.delivery_at}
           onChange={this.handleChange}
         />
+        <br />
         <TextField 
           floatingLabelText="Recipient Name"
-          hintText=""
           name="name"
           errorText={this.state.errors.input.recipient.name}
           value={this.state.input.recipient.name}
         />
+        <br />
         <TextField 
           floatingLabelText="Recipient Street"
-          hintText=""
           name="street"
           errorText={this.state.errors.input.recipient.street}
           value={this.state.input.recipient.street}
         />
+        <br />
         <TextField 
           floatingLabelText="Recipient City"
-          hintText=""
           name="city"
           errorText={this.state.errors.input.recipient.city}
           value={this.state.input.recipient.city}
         />
-        <TextField 
+        <br />
+        <SelectField
           floatingLabelText="Recipient Country"
-          hintText=""
-          name="country"
           errorText={this.state.errors.input.recipient.country}
           value={this.state.input.recipient.country}
-        />
+          onChange={this.handleChange}
+        >
+          <Countries />
+        </SelectField>
+        <br />
         <TextField 
           floatingLabelText="Recipient Zipcode"
-          hintText=""
           type="number"
           name="zipcode"
           errorText={this.state.errors.input.recipient.zipcode}
           value={this.state.input.recipient.zipcode}
         />
+        <br />
         <TextField 
           floatingLabelText="Recipient Phone"
           hintText=""
@@ -148,7 +190,7 @@ class DeliveryForm extends React.Component {
           errorText={this.state.errors.input.recipient.phone}
           value={this.state.input.recipient.phone}
         />
-        <Divider />
+        <br />
         <RaisedButton type="submit" label="Submit" />
       </form>
     );
