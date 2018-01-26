@@ -71,15 +71,11 @@ class DeliveryForm extends React.Component {
       && this.state.input.delivery_at.constructor === Object)
       {
         newState.errors.input.delivery_at = message;
-        console.log('Missing date')
       } 
     else {
       newState.errors.input.delivery_at = '';
-      console.log('NO missing date')
     }
-    console.log('newState', newState)
     this.setState(newState);
-    console.log(this.state);
 
     post('http://localhost:5000/tasks/', this.state.input)
     .then(data => console.log(data))
