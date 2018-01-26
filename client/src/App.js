@@ -1,14 +1,28 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import {RaisedButton,TextField, Divider} from 'material-ui';
+import {RaisedButton,TextField, Divider, DatePicker} from 'material-ui';
+
+function post(url, data) {
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+  })
+  .then(function(response) {
+    return response.json();
+  });
+}
 
 class DeliveryForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       input: {
-        delivery_at:"",
+        delivery_at:{},
         recipient:{
           name:"",
           zipcode:"",
@@ -53,19 +67,32 @@ class DeliveryForm extends React.Component {
       }
     }
 
+    if(Object.keys(this.state.input.delivery_at).length === 0 
+      && this.state.input.delivery_at.constructor === Object)
+      {
+        newState.errors.input.delivery_at = message;
+        console.log('Missing date')
+      } 
+    else {
+      newState.errors.input.delivery_at = '';
+      console.log('NO missing date')
+    }
+    console.log('newState', newState)
     this.setState(newState);
-    console.log(this.state)
+    console.log(this.state);
 
+    post('http://localhost:5000/tasks/', this.state.input)
+    .then(data => console.log(data))
 
   }
 
-  handleChange (event) {
-    const name = event.target.name;
-    const value = event.target.value;
+  handleChange (event, date) {
+    const name = event ? event.target.name : 'delivery_at';
+    const value = event ? event.target.value : date;
 
     let newState = {...this.state};
-    newState.input.recipient[name] = value;
-
+    if(name === 'delivery_at') newState.input[name] = value;
+    else newState.input.recipient[name] = value;
     this.setState(newState);
   }
 
@@ -74,6 +101,13 @@ class DeliveryForm extends React.Component {
     return (
       <form onSubmit={this.handleSubmit} 
       onChange={(event) => this.handleChange(event)}>
+        <DatePicker 
+          hintText="Delivery date" 
+          errorText={this.state.errors.input.delivery_at}
+          name="delivery_at"
+          value={this.state.input.delivery_at}
+          onChange={this.handleChange}
+        />
         <TextField 
           floatingLabelText="Recipient Name"
           hintText=""
