@@ -19,14 +19,18 @@ function http(url, data) {
   .then(function(response) {
     return response.json();
   });
+
 }
 
 class Countries extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      value: '',
       countries: [],
     }
+
+    this.handleChange = this.handleChange.bind(this);
 
     http('http://localhost:5000/countries')
       .then((data) => {
@@ -36,11 +40,38 @@ class Countries extends React.Component {
       })
   }
 
+  handleChange(event, index, value) {
+    const customEvent = {
+      target: {
+        name: this.props.name, 
+        value:value
+      }
+    
+    }
+    this.props.onChange(customEvent);
+    
+    let newState = {...this.state}
+    newState.value = value;
+    this.setState(newState);
+  }
 
+  menuItems(countries) {
+    return countries.map((country) => (
+      <MenuItem value={country.id} key={country.id} primaryText={country.name} />
+    ));
+  }
 
   render() {
     return (
-      this.state.countries.map(country => <MenuItem value={country.id} key={country.id} primaryText={country.name} />)
+    <SelectField
+          floatingLabelText={this.props.label ? this.props.label : ''}
+          errorText={this.props.error ? this.props.error : ''}
+          value={this.state.value}
+          name={this.props.name ? this.props.name : ''}
+          onChange={this.handleChange}
+        >
+      {this.menuItems(this.state.countries)}
+    </SelectField>
     )
   }
 }
@@ -77,12 +108,7 @@ class DeliveryForm extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-
     
-  }
-
-  getCountries() {
-    return http('http://localhost:5000/countries/');
   }
 
   handleSubmit(event) {
@@ -124,6 +150,8 @@ class DeliveryForm extends React.Component {
   handleChange (event, date) {
     const name = event ? event.target.name : 'delivery_at';
     const value = event ? event.target.value : date;
+    console.log('parent change: ', event, date)
+    console.log(name, value);
 
     let newState = {...this.state};
     if(name === 'delivery_at') newState.input[name] = value;
@@ -165,14 +193,13 @@ class DeliveryForm extends React.Component {
           value={this.state.input.recipient.city}
         />
         <br />
-        <SelectField
-          floatingLabelText="Recipient Country"
-          errorText={this.state.errors.input.recipient.country}
+        <Countries 
+          label="Recipient Country" 
+          name="country"
+          error={this.state.errors.input.recipient.country}
           value={this.state.input.recipient.country}
           onChange={this.handleChange}
-        >
-          <Countries />
-        </SelectField>
+          />
         <br />
         <TextField 
           floatingLabelText="Recipient Zipcode"
@@ -202,7 +229,6 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Send to Recipient</h1>
         </header>
         <DeliveryForm />
