@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import {RaisedButton,TextField, DatePicker, SelectField, MenuItem} from 'material-ui';
+import {
+    RaisedButton, 
+    TextField, 
+    DatePicker, 
+    SelectField, 
+    MenuItem } from 'material-ui';
 
 function http(url, data) {
   let request = {
@@ -21,6 +26,7 @@ function http(url, data) {
   });
 
 }
+
 
 class Countries extends React.Component {
   constructor(props) {
@@ -48,6 +54,7 @@ class Countries extends React.Component {
       }
     
     }
+
     this.props.onChange(customEvent);
     
     let newState = {...this.state}
@@ -65,10 +72,12 @@ class Countries extends React.Component {
     return (
     <SelectField
           floatingLabelText={this.props.label ? this.props.label : ''}
+          floatingLabelFixed={true}
           errorText={this.props.error ? this.props.error : ''}
           value={this.state.value}
           name={this.props.name ? this.props.name : ''}
           onChange={this.handleChange}
+          style={this.props.style}
         >
       {this.menuItems(this.state.countries)}
     </SelectField>
@@ -143,20 +152,22 @@ class DeliveryForm extends React.Component {
   
 
     http('http://localhost:5000/tasks/', this.state.input)
-    .then(data => console.log(data))
+    .then(data => {console.log(data); this.props.onChange(true);})
 
   }
 
   handleChange (event, date) {
     const name = event ? event.target.name : 'delivery_at';
     const value = event ? event.target.value : date;
-    console.log('parent change: ', event, date)
-    console.log(name, value);
 
     let newState = {...this.state};
     if(name === 'delivery_at') newState.input[name] = value;
     else newState.input.recipient[name] = value;
     this.setState(newState);
+  }
+
+  itemStyle = {
+    margin: '0 15px'
   }
 
 
@@ -165,73 +176,115 @@ class DeliveryForm extends React.Component {
       <form onSubmit={this.handleSubmit} 
       onChange={(event) => this.handleChange(event)}>
         <DatePicker 
-          hintText="Delivery date" 
+          floatingLabelText="Delivery date" 
+          floatingLabelFixed={true}
           errorText={this.state.errors.input.delivery_at}
           name="delivery_at"
           value={this.state.input.delivery_at}
           onChange={this.handleChange}
+          style={this.itemStyle}
         />
-        <br />
-        <TextField 
-          floatingLabelText="Recipient Name"
-          name="name"
-          errorText={this.state.errors.input.recipient.name}
-          value={this.state.input.recipient.name}
-        />
-        <br />
-        <TextField 
-          floatingLabelText="Recipient Street"
-          name="street"
-          errorText={this.state.errors.input.recipient.street}
-          value={this.state.input.recipient.street}
-        />
-        <br />
-        <TextField 
-          floatingLabelText="Recipient City"
-          name="city"
-          errorText={this.state.errors.input.recipient.city}
-          value={this.state.input.recipient.city}
-        />
-        <br />
-        <Countries 
-          label="Recipient Country" 
-          name="country"
-          error={this.state.errors.input.recipient.country}
-          value={this.state.input.recipient.country}
-          onChange={this.handleChange}
+        <div>
+          <TextField 
+            floatingLabelText="Recipient Name"
+            floatingLabelFixed={true}
+            name="name"
+            errorText={this.state.errors.input.recipient.name}
+            value={this.state.input.recipient.name}
+            style={this.itemStyle}
           />
-        <br />
-        <TextField 
-          floatingLabelText="Recipient Zipcode"
-          type="number"
-          name="zipcode"
-          errorText={this.state.errors.input.recipient.zipcode}
-          value={this.state.input.recipient.zipcode}
-        />
-        <br />
+          <TextField 
+            floatingLabelText="Recipient Street"
+            name="street"
+            floatingLabelFixed={true}
+            errorText={this.state.errors.input.recipient.street}
+            value={this.state.input.recipient.street}
+            style={this.itemStyle}
+          />
+        </div>
+        <div>
+          <TextField 
+            floatingLabelText="Recipient City"
+            floatingLabelFixed={true}
+            name="city"
+            errorText={this.state.errors.input.recipient.city}
+            value={this.state.input.recipient.city}
+            className="City"
+            style={this.itemStyle}
+          />
+          <TextField 
+            floatingLabelText="Recipient Zipcode"
+            floatingLabelFixed={true}
+            type="number"
+            name="zipcode"
+            errorText={this.state.errors.input.recipient.zipcode}
+            value={this.state.input.recipient.zipcode}
+            style={{...this.itemStyle,width:'150px'}}
+          />
+          <Countries 
+            label="Recipient Country" 
+            name="country"
+            error={this.state.errors.input.recipient.country}
+            value={this.state.input.recipient.country}
+            onChange={this.handleChange}
+            className="country"
+            style={this.itemStyle}
+            />
+        </div>
         <TextField 
           floatingLabelText="Recipient Phone"
+          floatingLabelFixed={true}
           hintText=""
           type="number"
           name="phone"
           errorText={this.state.errors.input.recipient.phone}
           value={this.state.input.recipient.phone}
+          style={this.itemStyle}
         />
-        <br />
-        <RaisedButton type="submit" label="Submit" />
+        <RaisedButton 
+          type="submit" 
+          label="Submit" 
+          style={{...this.itemStyle, marginTop:'30px', float:'right'}} />
       </form>
     );
   }
 }
 
+class Deliverd extends Component {
+  render() {
+    return ( 
+    <div className="Submitted">
+      <h1>Has been submit</h1>
+    </div>
+    )
+  }
+}
+
+
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      submitted:false
+    }
+    this.handleChange = this.handleChange.bind(this);
+
+  }
+
+  handleChange(event) {
+    let newState = {...this.state};
+    newState.submitted = true;
+    this.setState(newState);
+  }
+
+  
   render() {
     return (
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Send to Recipient</h1>
         </header>
-        <DeliveryForm />
+        {this.state.submitted ? <Deliverd /> : <DeliveryForm onChange={this.handleChange} />}
       </div>
     );
   }
