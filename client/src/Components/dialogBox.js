@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { FlatButton, Dialog} from 'material-ui';
 
-export default class DialogBox extends React.Component {
+class DialogBox extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -37,3 +37,5 @@ export default class DialogBox extends React.Component {
     );
   }
 }
+
+export default DialogBox;

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import http from '../Services/http';
 import { SelectField, MenuItem,} from 'material-ui';
 
-export default class Countries extends React.Component {
+class Countries extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
@@ -44,17 +44,19 @@ export default class Countries extends React.Component {
   
     render() {
       return (
-      <SelectField
-            floatingLabelText={this.props.label ? this.props.label : ''}
-            floatingLabelFixed={true}
-            errorText={this.props.error ? this.props.error : ''}
-            value={this.state.value}
-            name={this.props.name ? this.props.name : ''}
-            onChange={this.handleChange}
-            style={this.props.style}
-          >
-        {this.menuItems(this.state.countries)}
-      </SelectField>
+        <SelectField
+                floatingLabelText={this.props.label ? this.props.label : ''}
+                floatingLabelFixed={true}
+                errorText={this.props.error ? this.props.error : ''}
+                value={this.state.value}
+                name={this.props.name ? this.props.name : ''}
+                onChange={this.handleChange}
+                style={this.props.style}
+            >
+            {this.menuItems(this.state.countries)}
+        </SelectField>
       )
     }
-  }
+}
+
+  export default Countries;

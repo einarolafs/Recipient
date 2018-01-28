@@ -18,4 +18,3 @@ export default function http(url, data) {
     });
   
   }
-  

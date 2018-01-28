@@ -1,5 +1,5 @@
 {
-  "name": "fliit-admin",
+  "name": "Recipient-Form",
   "version": "1.0.0",
   "scripts": {
     "build": "yarn && cd client && yarn",

@@ -1,4 +1,4 @@
-# Fliit Admin (Frontend Challenge)
+# Recipient Form (Frontend Challenge)
 
 ## Running the project
 
