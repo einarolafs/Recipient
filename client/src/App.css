@@ -17,3 +17,8 @@ form {
   margin:20px auto;
   width:580px;
 }
+
+.submitted {
+  width:100%;
+  text-align: center;
+}

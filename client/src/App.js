@@ -1,89 +1,18 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import http from './Services/http'
+import Countries from './Components/countries'
+import DialogBox from './Components/dialogBox'
 import {
     RaisedButton, 
+    FlatButton,
     TextField, 
     DatePicker, 
     SelectField, 
-    MenuItem } from 'material-ui';
+    MenuItem,
+    Snackbar,
+    Dialog, } from 'material-ui';
 
-function http(url, data) {
-  let request = {
-    method: data ? 'POST' : 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    }
-  }
-  
-  if(data) request.body = JSON.stringify(data)
-
-  return fetch(url, request)
-
-  .then(function(response) {
-    return response.json();
-  });
-
-}
-
-
-class Countries extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: '',
-      countries: [],
-    }
-
-    this.handleChange = this.handleChange.bind(this);
-
-    http('http://localhost:5000/countries')
-      .then((data) => {
-        let newState = {...this.state}
-        newState.countries = data;
-        this.setState(newState);
-      })
-  }
-
-  handleChange(event, index, value) {
-    const customEvent = {
-      target: {
-        name: this.props.name, 
-        value:value
-      }
-    
-    }
-
-    this.props.onChange(customEvent);
-    
-    let newState = {...this.state}
-    newState.value = value;
-    this.setState(newState);
-  }
-
-  menuItems(countries) {
-    return countries.map((country) => (
-      <MenuItem value={country.id} key={country.id} primaryText={country.name} />
-    ));
-  }
-
-  render() {
-    return (
-    <SelectField
-          floatingLabelText={this.props.label ? this.props.label : ''}
-          floatingLabelFixed={true}
-          errorText={this.props.error ? this.props.error : ''}
-          value={this.state.value}
-          name={this.props.name ? this.props.name : ''}
-          onChange={this.handleChange}
-          style={this.props.style}
-        >
-      {this.menuItems(this.state.countries)}
-    </SelectField>
-    )
-  }
-}
 
 class DeliveryForm extends React.Component {
   constructor(props) {
@@ -97,8 +26,8 @@ class DeliveryForm extends React.Component {
           street:"",
           city:"",
           country:"",
-          phone:""
-        }
+          phone:"",
+        },
       },
       errors: {
         tried_to_submit:false,  
@@ -110,13 +39,19 @@ class DeliveryForm extends React.Component {
             street:"",
             city:"",
             country:"",
-            phone:""
-          }
-      },}
+            phone:"",
+          },
+        },
+      },
+      warning: {
+        message: <span>Could not submit your request, please try again later</span>,
+        open: false,
+      }
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
     
   }
 
@@ -151,8 +86,18 @@ class DeliveryForm extends React.Component {
     if(error)return
   
 
-    http('http://localhost:5000/tasks/', this.state.input)
-    .then(data => {console.log(data); this.props.onChange(true);})
+    http('http://localhost:5001/tasks/', this.state.input)
+    .then(data => {
+      console.log(data); 
+      this.props.onChange(true);})
+    .catch(error => {
+      console.error(error)
+      const newState = {...this.state};
+      newState.warning.open = true;
+      newState.warning.message = 
+        error.error ? <span>{error.error}</span> : this.state.warning.message
+      this.setState(newState);
+    })
 
   }
 
@@ -166,10 +111,15 @@ class DeliveryForm extends React.Component {
     this.setState(newState);
   }
 
-  itemStyle = {
-    margin: '0 15px'
+  closeDialog() {
+    let newState = {...this.state};
+    newState.warning.open = false
+    this.setState(newState);
   }
 
+  inputStyle = {
+    margin: '0 15px'
+  }
 
   render() {
     return (
@@ -182,7 +132,7 @@ class DeliveryForm extends React.Component {
           name="delivery_at"
           value={this.state.input.delivery_at}
           onChange={this.handleChange}
-          style={this.itemStyle}
+          style={this.inputStyle}
         />
         <div>
           <TextField 
@@ -191,7 +141,7 @@ class DeliveryForm extends React.Component {
             name="name"
             errorText={this.state.errors.input.recipient.name}
             value={this.state.input.recipient.name}
-            style={this.itemStyle}
+            style={this.inputStyle}
           />
           <TextField 
             floatingLabelText="Recipient Street"
@@ -199,7 +149,7 @@ class DeliveryForm extends React.Component {
             floatingLabelFixed={true}
             errorText={this.state.errors.input.recipient.street}
             value={this.state.input.recipient.street}
-            style={this.itemStyle}
+            style={this.inputStyle}
           />
         </div>
         <div>
@@ -210,7 +160,7 @@ class DeliveryForm extends React.Component {
             errorText={this.state.errors.input.recipient.city}
             value={this.state.input.recipient.city}
             className="City"
-            style={this.itemStyle}
+            style={this.inputStyle}
           />
           <TextField 
             floatingLabelText="Recipient Zipcode"
@@ -219,7 +169,7 @@ class DeliveryForm extends React.Component {
             name="zipcode"
             errorText={this.state.errors.input.recipient.zipcode}
             value={this.state.input.recipient.zipcode}
-            style={{...this.itemStyle,width:'150px'}}
+            style={{...this.inputStyle,width:'150px'}}
           />
           <Countries 
             label="Recipient Country" 
@@ -228,7 +178,7 @@ class DeliveryForm extends React.Component {
             value={this.state.input.recipient.country}
             onChange={this.handleChange}
             className="country"
-            style={this.itemStyle}
+            style={this.inputStyle}
             />
         </div>
         <TextField 
@@ -239,27 +189,31 @@ class DeliveryForm extends React.Component {
           name="phone"
           errorText={this.state.errors.input.recipient.phone}
           value={this.state.input.recipient.phone}
-          style={this.itemStyle}
+          style={this.inputStyle}
         />
         <RaisedButton 
           type="submit" 
           label="Submit" 
-          style={{...this.itemStyle, marginTop:'30px', float:'right'}} />
+          style={{...this.inputStyle, marginTop:'30px', float:'right'}} />
+        
+        <DialogBox 
+          open={this.state.warning.open} 
+          message={this.state.warning.message}
+          onClick={this.closeDialog}
+
+        />
       </form>
+
     );
   }
 }
 
-class Deliverd extends Component {
-  render() {
-    return ( 
-    <div className="Submitted">
-      <h1>Has been submit</h1>
-    </div>
-    )
-  }
-}
-
+const Deliverd = () => ( 
+  <div className="submitted">
+    <h1>Task sent</h1>
+    <p>Your task has been submitted and will be processed soon</p>
+  </div>
+)
 
 class App extends Component {
   constructor(props) {
