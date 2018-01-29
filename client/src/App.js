@@ -79,7 +79,6 @@ class DeliveryForm extends React.Component {
     const date = payload.delivery_at;
     payload.delivery_at =
     `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
-    console.log(payload)
   
     http('http://localhost:5000/tasks/', payload)
     .then(data => {
@@ -89,7 +88,6 @@ class DeliveryForm extends React.Component {
       newState.warning.open = true;
       newState.warning.message = 
         error.error ? <span>{error.error}</span> : this.state.warning.message
-      console.log(newState)
       this.setState(newState);
     })
 
