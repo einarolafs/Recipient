@@ -6,34 +6,30 @@ import DialogBox from './Components/dialogBox'
 import { RaisedButton, TextField, DatePicker} from 'material-ui';
 
 
+function formInput(state) { 
+  
+  return {
+    delivery_at: state ? {} : "",
+    recipient: {
+      name:"",
+      zipcode:"",
+      street:"",
+      city:"",
+      country:"",
+      phone:"",
+    }
+  }
+
+}
+
 class DeliveryForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      input: {
-        delivery_at:{},
-        recipient:{
-          name:"",
-          zipcode:"",
-          street:"",
-          city:"",
-          country:"",
-          phone:"",
-        },
-      },
+      input: formInput(true),
       errors: {
         tried_to_submit:false,  
-        input: {
-          delivery_at:"",
-          recipient:{
-            name:"",
-            zipcode:"",
-            street:"",
-            city:"",
-            country:"",
-            phone:"",
-          },
-        },
+        input: formInput(),
       },
       warning: {
         message: <span>Could not submit your request, please try again later</span>,
@@ -226,7 +222,6 @@ class App extends Component {
     this.setState(newState);
   }
 
-  
   render() {
     return (
       <div className="App">
