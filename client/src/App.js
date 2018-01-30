@@ -73,9 +73,10 @@ class DeliveryForm extends React.Component {
       newState.errors.input.delivery_at = '';
     }
 
-    this.setState(newState)
-
-    if(error)return
+    if(error){
+      this.setState(newState);
+      return
+    }
 
     let payload = {...this.state.input};
     const date = payload.delivery_at;
