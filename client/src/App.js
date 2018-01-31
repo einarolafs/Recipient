@@ -4,7 +4,7 @@ import http from './Services/http'
 import Countries from './Components/countries'
 import DialogBox from './Components/dialogBox'
 import { RaisedButton, TextField, DatePicker} from 'material-ui';
-import _ from 'lodash';
+import {cloneDeep} from 'lodash';
 
 
 // A component that returns a text input
@@ -35,10 +35,13 @@ const Date = (props) => {
 will check the type send down with the props to determind what type of 
 input should be used */
 const Input = (props) => {
-  if (props.type === "date") {
-    return <Date {...props} />
-  } else {
-    return <Text {...props} />
+  switch(props.type) {
+    case "date":
+      return <Date {...props} />
+    case "countries":
+      return <Countries {...props} />
+    default:
+      return <Text {...props} />
   }
 }
 
@@ -89,7 +92,7 @@ class DeliveryForm extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    let newState = _.cloneDeep(this.state);
+    let newState = cloneDeep(this.state);
     let error = false;
     const message = "This field is required";
 
@@ -117,7 +120,7 @@ class DeliveryForm extends Component {
       return
     }
 
-    let payload = _.cloneDeep(this.state.input);
+    let payload = cloneDeep(this.state.input);
     const date = payload.delivery_at;
     payload.delivery_at =
     `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
@@ -126,7 +129,7 @@ class DeliveryForm extends Component {
     .then(data => {
       this.props.onChange(true);})
     .catch(error => {
-      const newState = _.cloneDeep(this.state);;
+      const newState = cloneDeep(this.state);;
       newState.warning.open = true;
       newState.warning.message = 
         error.error ? <span>{error.error}</span> : this.state.warning.message
@@ -138,14 +141,14 @@ class DeliveryForm extends Component {
   handleChange (event, date) {
     const name = event ? event.target.name : 'delivery_at';
     const value = event ? event.target.value : date;
-    let newState = _.cloneDeep(this.state);
+    let newState = cloneDeep(this.state);
     if(name === 'delivery_at') newState.input[name] = value;
     else newState.input.recipient[name] = value;
     this.setState(newState);
   }
 
   closeDialog() {
-    let newState = _.cloneDeep(this.state);
+    let newState = cloneDeep(this.state);
     newState.warning.open = false
     this.setState(newState);
   }
@@ -194,12 +197,10 @@ class DeliveryForm extends Component {
             style={this.inputStyle}
             type="text"
           />
-          <TextField 
-            floatingLabelText="Recipient Zipcode"
-            floatingLabelFixed={true}
-            type="number"
+          <Input 
+            label="Recipient Zipcode"
             name="zipcode"
-            errorText={this.state.errors.input.recipient.zipcode}
+            error={this.state.errors.input.recipient.zipcode}
             value={this.state.input.recipient.zipcode}
             style={{...this.inputStyle,width:'150px'}}
           />
@@ -213,13 +214,10 @@ class DeliveryForm extends Component {
             style={this.inputStyle}
             />
         </div>
-        <TextField 
-          floatingLabelText="Recipient Phone"
-          floatingLabelFixed={true}
-          hintText=""
-          type="number"
+        <Input 
+          label="Recipient Phone"
           name="phone"
-          errorText={this.state.errors.input.recipient.phone}
+          error={this.state.errors.input.recipient.phone}
           value={this.state.input.recipient.phone}
           style={this.inputStyle}
         />
@@ -258,7 +256,7 @@ class App extends Component {
   }
 
   handleChange(event) {
-    let newState = _.cloneDeep(this.state);
+    let newState = cloneDeep(this.state);
     newState.submitted = true;
     this.setState(newState);
   }
