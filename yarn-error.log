@@ -15,7 +15,7 @@ Platform:
 
 npm manifest: 
   {
-    "name": "fliit-admin",
+    "name": "recipient-form",
     "version": "1.0.0",
     "scripts": {
       "client": "cd client && yarn start",
