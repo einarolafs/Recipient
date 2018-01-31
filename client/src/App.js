@@ -89,7 +89,7 @@ class DeliveryForm extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    let newState = {...this.state}
+    let newState = _.cloneDeep(this.state);
     let error = false;
     const message = "This field is required";
 
@@ -117,7 +117,7 @@ class DeliveryForm extends Component {
       return
     }
 
-    let payload = {...this.state.input};
+    let payload = _.cloneDeep(this.state.input);
     const date = payload.delivery_at;
     payload.delivery_at =
     `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
@@ -126,7 +126,7 @@ class DeliveryForm extends Component {
     .then(data => {
       this.props.onChange(true);})
     .catch(error => {
-      const newState = {...this.state};
+      const newState = _.cloneDeep(this.state);;
       newState.warning.open = true;
       newState.warning.message = 
         error.error ? <span>{error.error}</span> : this.state.warning.message
@@ -138,15 +138,14 @@ class DeliveryForm extends Component {
   handleChange (event, date) {
     const name = event ? event.target.name : 'delivery_at';
     const value = event ? event.target.value : date;
-
-    let newState = {...this.state};
+    let newState = _.cloneDeep(this.state);
     if(name === 'delivery_at') newState.input[name] = value;
     else newState.input.recipient[name] = value;
     this.setState(newState);
   }
 
   closeDialog() {
-    let newState = {...this.state};
+    let newState = _.cloneDeep(this.state);
     newState.warning.open = false
     this.setState(newState);
   }
@@ -259,7 +258,7 @@ class App extends Component {
   }
 
   handleChange(event) {
-    let newState = {...this.state};
+    let newState = _.cloneDeep(this.state);
     newState.submitted = true;
     this.setState(newState);
   }
