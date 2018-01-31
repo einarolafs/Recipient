@@ -4,8 +4,51 @@ import http from './Services/http'
 import Countries from './Components/countries'
 import DialogBox from './Components/dialogBox'
 import { RaisedButton, TextField, DatePicker} from 'material-ui';
+import _ from 'lodash';
 
 
+// A component that returns a text input
+const Text = (props) => {
+  return (
+    <TextField 
+      {...props}
+      floatingLabelText={props.label}
+      floatingLabelFixed={true}
+      errorText={props.error}
+    />
+  )
+}
+
+// A compontent that returns a date selector
+const Date = (props) => {
+  return (
+    <DatePicker 
+      {...props}
+      floatingLabelText={props.label}
+      floatingLabelFixed={true}
+      errorText={props.error}
+    />
+  )
+}
+
+/* One source to refer to for creating a input field, 
+will check the type send down with the props to determind what type of 
+input should be used */
+const Input = (props) => {
+  if (props.type === "date") {
+    return <Date {...props} />
+  } else {
+    return <Text {...props} />
+  }
+}
+
+/***
+Define the structure of the data, 
+if the value state is set to true then some inputs may be 
+changed to fit to the needs of the form, souch as using a 
+object for date selectors, as required of 
+the Material UI DatePicker component
+***/
 function formInput(state) { 
   
   return {
@@ -22,7 +65,7 @@ function formInput(state) {
 
 }
 
-class DeliveryForm extends React.Component {
+class DeliveryForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -126,32 +169,31 @@ class DeliveryForm extends React.Component {
           style={this.inputStyle}
         />
         <div>
-          <TextField 
-            floatingLabelText="Recipient Name"
-            floatingLabelFixed={true}
+          <Input
+            type="text" 
+            label="Recipient Name"
             name="name"
-            errorText={this.state.errors.input.recipient.name}
+            error={this.state.errors.input.recipient.name}
             value={this.state.input.recipient.name}
             style={this.inputStyle}
+            onChange={this.handleChange}
           />
-          <TextField 
-            floatingLabelText="Recipient Street"
+          <Text 
+            label="Recipient Street"
             name="street"
-            floatingLabelFixed={true}
-            errorText={this.state.errors.input.recipient.street}
+            error={this.state.errors.input.recipient.street}
             value={this.state.input.recipient.street}
             style={this.inputStyle}
           />
         </div>
         <div>
-          <TextField 
-            floatingLabelText="Recipient City"
-            floatingLabelFixed={true}
+          <Input 
+            label="Recipient City"
             name="city"
-            errorText={this.state.errors.input.recipient.city}
+            error={this.state.errors.input.recipient.city}
             value={this.state.input.recipient.city}
-            className="City"
             style={this.inputStyle}
+            type="text"
           />
           <TextField 
             floatingLabelText="Recipient Zipcode"
