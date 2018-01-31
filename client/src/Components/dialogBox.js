@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import { FlatButton, Dialog} from 'material-ui';
 
 class DialogBox extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   handleOpen = () => {
     this.setState({...this.state, open: true});
   };
